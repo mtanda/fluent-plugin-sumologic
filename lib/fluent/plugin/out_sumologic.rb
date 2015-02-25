@@ -36,6 +36,15 @@ class Fluent::SumologicOutput< Fluent::BufferedOutput
     super
   end
 
+  def client
+    return @_client if @_client
+
+    @_client = Net::HTTP.new(@host, @port.to_i)
+    @_client.use_ssl = true
+    @_client.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    @_client
+  end
+
   def write(chunk)
     messages = []
     
@@ -56,13 +65,6 @@ class Fluent::SumologicOutput< Fluent::BufferedOutput
         end
     end
 
-    http = Net::HTTP.new(@host, @port.to_i)
-    http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    http.set_debug_output $stderr
-
-    request = Net::HTTP::Post.new(@path)
-    request.body = messages.join("\n")
-    http.request(request)
+    client.post(@path, messages.join("\n"))
   end
 end

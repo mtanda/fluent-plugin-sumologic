@@ -9,6 +9,7 @@ class Fluent::SumologicOutput< Fluent::BufferedOutput
   config_param :port, :integer, :default => 443
   config_param :path, :string,  :default => '/receiver/v1/http/XXX'
   config_param :format, :string, :default => 'json'
+  config_param :source_name, :string, :default => ''
 
   include Fluent::SetTagKeyMixin
   config_set_default :include_tag_key, false
@@ -65,6 +66,8 @@ class Fluent::SumologicOutput< Fluent::BufferedOutput
         end
     end
 
-    client.post(@path, messages.join("\n"))
+    header = {}
+    header['X-Sumo-Name'] = @source_name unless @source_name.empty?
+    client.post(@path, messages.join("\n"), header)
   end
 end

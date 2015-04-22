@@ -68,6 +68,11 @@ class Fluent::SumologicOutput< Fluent::BufferedOutput
 
     header = {}
     header['X-Sumo-Name'] = @source_name unless @source_name.empty?
-    client.post(@path, messages.join("\n"), header)
+    begin
+      client.post(@path, messages.join("\n"), header)
+    rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT => e
+      @_client = nil
+      raise ConnectionFailure, "Could not push logs to SumoLogic. #{e.message}"
+    end
   end
 end

@@ -42,7 +42,7 @@ class Fluent::SumologicOutput< Fluent::BufferedOutput
 
     @_client = Net::HTTP.new(@host, @port.to_i)
     @_client.use_ssl = true
-    @_client.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    @_client.verify_mode = OpenSSL::SSL::VERIFY_PEER
     @_client
   end
 
